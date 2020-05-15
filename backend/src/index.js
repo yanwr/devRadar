@@ -11,7 +11,7 @@
 const app = express();
 
 // connection mongoDB               user : senha                              /nameDB
-    mongoose.connect('mongodb+srv://yanwr:yanywr02@cluster0-7vy27.mongodb.net/devRadar?retryWrites=true&w=majority', {
+    mongoose.connect('mongodb+srv://yanwr:******@cluster0-7vy27.mongodb.net/devRadar?retryWrites=true&w=majority', {
         useNewUrlParser: true, 
         useUnifiedTopology: true,
     });
