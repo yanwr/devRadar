@@ -3,8 +3,8 @@ import MapView, { Marker, Callout } from 'react-native-maps'; // utilizando o Ma
 import { StyleSheet, Image, View, Text, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import { requestPermissionsAsync, getCurrentPositionAsync } from 'expo-location'; // o primeiro vai pedir permissao para usar a localização do user e a segunda vai gettar a localização
 import { MaterialIcons } from "@expo/vector-icons"; // pegando todos os Icons de onde eu quiser com o expo
-
-import api from '../services/api'; 
+import api from '../services/api';
+import {connect, disconnect, subscribeToNewUsers} from '../services/socket';
 
 function Main({ navigation }){
 //#region Estado  
@@ -12,7 +12,7 @@ function Main({ navigation }){
     const [ users, setUsers ] = useState([]); // sempre iniciar o state com o que ele ira receber. Nesse caso sera uma lista de usuarios, entao um array vazio.
     const [ tecnologias, setTecnologias ] = useState('');
 //#endregion
-    useEffect(() => {
+    useEffect(() => { // useEffect serve para disparar uma função toda vez que o Estado for alterado. Ele recebe 2 parametros: 1° qual a função que ele deve executar. 2° quando a função deve executar, mandamos um -- [] vetor -- se o vetor tiver vazio, a função sera executada somente uma vez, se tiver algo, todas vezes que esse "algo" for alterado, a função sera executada.
         async function loadInitialPosition(){
             const { granted } = await requestPermissionsAsync();
             if(granted){
@@ -32,7 +32,17 @@ function Main({ navigation }){
         }
         loadInitialPosition();
     }, []);
-    
+
+    useEffect(() => {
+        subscribeToNewUsers( user => setUsers([...users, user]))
+    }, [users]);
+
+    function setupWebSocket(){
+        disconnect();
+        const { latitude, longitude } = currentRegion;
+        connect(latitude, longitude, tecnologias);
+    }
+
     async function loadUsers(){ // essa função vai pegar os users que tiverem as buscar do Input
         const { latitude, longitude } = currentRegion;
 
@@ -45,6 +55,7 @@ function Main({ navigation }){
         });
         
         setUsers(response.data.users);
+        setupWebSocket();
     }
 
     function handleRegionChanged(region){ // essa funçao serve para toda vez que o usuario no ceclular ir alterando a longitude e latitude.

@@ -1,6 +1,6 @@
 const axios = require('axios');// biblioteca axios serve para ter comunicação entre os APi RESTfull // vamos pegar dados do GitHub 
 const User = require('../models/User');// pegando de models nossa Entity User para ser colocado os valores
-
+const { findConnections, sendMessage} = require('../webSocket');
 // existem 5 function dentro de um controller =  index: mostra lista de todos, show: mostra unico, store: cadastrar, update: atualizar, destroy: deletar
 
 module.exports = {
@@ -35,7 +35,14 @@ module.exports = {
                 bio: bio,
                 tecnologias: arrTec_trampo, 
                 location: location,
-            }); 
+            });
+
+            /* Parte que tem haver com o socket. Filtrar as connections la do webSocket.js,
+                se uma delas estiver no raio de 10km de distancia e se o novo User tenha pelo
+                menos uma das tecnologias filtradas
+            */
+            const sendSocketMessageTo = findConnections({ latitude, longitude}, tecnologias);
+            sendMessage(sendSocketMessageTo, 'NewUser', user);
         }
         return response.json(user);
     },

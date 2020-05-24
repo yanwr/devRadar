@@ -6,12 +6,19 @@
         const routes = require('./routes');
     // pegando a bibliote cors para que seja liberado o acesso EXTERNO para qualquer aplicação
         const cors = require('cors');
+    // protocolo HTTP
+        const http = require('http');
+    // WebSocket
+        const { setupWebSocket } = require('./webSocket');
 //
 
 const app = express();
+const server = http.Server(app);
+
+setupWebSocket(server);
 
 // connection mongoDB               user : senha                              /nameDB
-    mongoose.connect('mongodb+srv://yanwr:******@cluster0-7vy27.mongodb.net/devRadar?retryWrites=true&w=majority', {
+    mongoose.connect('mongodb+srv://yanwr:yanywr02@cluster0-7vy27.mongodb.net/devRadar?retryWrites=true&w=majority', {
         useNewUrlParser: true, 
         useUnifiedTopology: true,
     });
@@ -24,5 +31,5 @@ const app = express();
     app.use(routes);
 // 
 // a porta que o localhost vai ouvir 
-    app.listen(2525);
+    server.listen(2525);
 //
